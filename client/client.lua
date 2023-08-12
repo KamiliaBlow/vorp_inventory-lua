@@ -82,6 +82,9 @@ AddEventHandler("vorpinventory:loaded", function()
         Wait(100)
     end
     local playerammo = playerammoinfo["ammo"]
+    for k,v in pairs(playerammo) do 
+        SetPedAmmoByType(PlayerPedId(), GetHashKey(k), v)
+    end
     SendNUIMessage({
         action = "updateammo",
         ammo   = playerammo

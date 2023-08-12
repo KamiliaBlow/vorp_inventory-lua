@@ -46,19 +46,26 @@ end
 
 InventoryService.UseItem = function(itemName, itemId, args)
 	local _source = source
+
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local userInventory = UsersInventories["default"][identifier]
+
+	if type(itemName) ~= "string" then
+		print("[^2UseItem^7] ^1Error^7: Item name is not a string.")
+		return
+	end
+
 	local svItem = svItems[itemName]
 
-	if svItem == nil then
+	if not svItem then
 		print("[^2UseItem^7] ^1Error^7: Item [^3" .. tostring(itemName) .. "^7] does not exist in DB.")
 		return
 	end
 
-	if UsableItemsFunctions[itemName] ~= nil and userInventory[itemId] ~= nil then
+	if UsableItemsFunctions[itemName] and userInventory[itemId] then
 		local item = userInventory[itemId]
-		if item ~= nil then
+		if item then
 			local itemArgs = json.decode(json.encode(svItem))
 			itemArgs.metadata = item:getMetadata()
 			itemArgs.mainid = itemId
@@ -67,7 +74,8 @@ InventoryService.UseItem = function(itemName, itemId, args)
 				item = itemArgs,
 				args = args
 			}
-			UsableItemsFunctions[itemName](arguments)
+
+			UsableItemsFunctions[tostring(itemName)](arguments)
 		end
 	end
 	return false

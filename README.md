@@ -1,8 +1,7 @@
 # Inventory in Lua System for VORPCore framework
 
 ## Requirements
-- [VORP_Core](https://github.com/VORPCORE/vorp-core-lua)
-- [VORP Inputs](https://github.com/VORPCORE/vorp_inputs-lua)
+- [VORP CORE](https://github.com/VORPCORE/vorp-core-lua)
 
 ## How to install
 * Download the lastest version of VORP Inventory
@@ -12,14 +11,14 @@
 
 
 ## Features
-* Unique weapons in order not to duplicate them.
-* Each weapon has its own ammo and can have diferent type of ammo.
+* extensive API
+* Unique weapons 
 * give ammo from your belt
-* When dropping or giving a weapon you give it with all the modifications and ammo.
-* It also has usable items.
+* drop give pick up functions
+* usable items.
 * KLS.
-* metadata
-* storage Api
+* metadata for items
+* storage API
 
 
 ![image](https://user-images.githubusercontent.com/87246847/156600012-3901dac7-73f8-4577-a8f5-9a60d7e3150b.png)
@@ -34,8 +33,9 @@
 - Added descriptions of each item in inventory, for items (desc is in DB), for weapons (desc is in config.lua), for dollars and gold (desc are in html)
 
 
-## Wiki
-[Wiki VORP Inventory](https://outsider31000.github.io/VORP_API-docs/posts/inventory-lua)
+## DOCUMENTATION
+
+[VORP INVENTORY](https://vorpcore.github.io/VORP_Documentation/api/inventory)
 
 ## Credits
 - To [Val3ro](https://github.com/Val3ro) for the initial work.

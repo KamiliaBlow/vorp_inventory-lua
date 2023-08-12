@@ -36,6 +36,136 @@
         </div>
 
 
+        <div class="mainButtonContainer">
+            <button class="mainButton" type="button" data-target="mainButton1" onclick="toggleDropdown('mainButton1')">
+                <img src="img/itemtypes/satchel_nav_kit.png" alt="Main Button Image">
+            </button>
+
+            <button class="mainButton" type="button" data-target="mainButton2" onclick="toggleDropdown('mainButton2')">
+                <img src="img/itemtypes/clothing.png" alt="Main Button Image">
+            </button>
+        </div>
+
+
+        <div class="imageButtonContainer">
+
+            <div class="dropdownButtonContainer mainButton1">
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','all','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_all.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','medical','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_remedies.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','herbs','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_herbs.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','foods','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_provisions.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','weapons','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/weapon.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','ammo','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/ammo.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','tools','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_materials.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button"
+                    onclick="action('itemtype','valuables','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_valuables.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','horse','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_horse_items.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button" onclick="action('itemtype','animals','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_animals.png" alt="Image 2">
+                    </div>
+                </button>
+
+                <button class="dropdownButton" type="button"
+                    onclick="action('itemtype','documents','inventoryElement')">
+                    <div>
+                        <img src="img/itemtypes/satchel_nav_documents.png" alt="Image 2">
+                    </div>
+                </button>
+            </div>
+
+
+            <div class="dropdownButtonContainer mainButton2">
+                <button class="dropdownButton" type="button" onclick="action('clothing','hat','inventoryElement')">
+                    <img src="img/itemtypes/hat.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','boots','inventoryElement')">
+                    <img src="img/itemtypes/boots.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','shirt','inventoryElement')">
+                    <img src="img/itemtypes/shirt.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','ccoat','inventoryElement')">
+                    <img src="img/itemtypes/ccoat.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','coat','inventoryElement')">
+                    <img src="img/itemtypes/coat.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','poncho','inventoryElement')">
+                    <img src="img/itemtypes/poncho.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','glove','inventoryElement')">
+                    <img src="img/itemtypes/gloves.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','cloak','inventoryElement')">
+                    <img src="img/itemtypes/cloak.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','mask','inventoryElement')">
+                    <img src="img/itemtypes/mask.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','vest','inventoryElement')">
+                    <img src="img/itemtypes/vest.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','neckwear','inventoryElement')">
+                    <img src="img/itemtypes/neckwear.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','sleeves','inventoryElement')">
+                    <img src="img/itemtypes/sleeves.png" alt="Image 2">
+                </button>
+                <button class="dropdownButton" type="button" onclick="action('clothing','belt','inventoryElement')">
+                    <img src="img/itemtypes/buck.png" alt="Image 2">
+                </button>
+            </div>
+
+        </div>
+
+
         <div id="transaction-loader">
             <div class="wrap-model">
                 <div class="revolver">
@@ -50,6 +180,7 @@
             </div>
         </div>
     </div>
+
     <div id="secondInventoryHud">
         <div id="titleHorse"></div>
         <div id="secondInventoryElement">
@@ -59,7 +190,83 @@
         <div class="capacity">
             <a id="current-cap-value"></a>/<a id="capacity-value"></a>
         </div>
+
+        <div class="imageButtonContainer1">
+
+            <button class="dropdownButton1" type="button" onclick="action('itemtype','all','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_all.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button"
+                onclick="action('itemtype','medical','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_remedies.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button" onclick="action('itemtype','herbs','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_herbs.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button" onclick="action('itemtype','foods','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_provisions.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button"
+                onclick="action('itemtype','weapons','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/weapon.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button" onclick="action('itemtype','ammo','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/ammo.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button" onclick="action('itemtype','tools','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_materials.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button"
+                onclick="action('itemtype','valuables','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_valuables.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button" onclick="action('itemtype','horse','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_horse_items.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button"
+                onclick="action('itemtype','animals','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_animals.png" alt="Image 2">
+                </div>
+            </button>
+
+            <button class="dropdownButton1" type="button"
+                onclick="action('itemtype','documents','secondInventoryElement')">
+                <div>
+                    <img src="img/itemtypes/satchel_nav_documents.png" alt="Image 2">
+                </div>
+            </button>
+
+        </div>
     </div>
+
     <div id="character-selection">
         <button class="close-btn" type="button" onclick="closeCharacterSelection()">X</button>
         <h1 id="character-select-title">Select</h1>

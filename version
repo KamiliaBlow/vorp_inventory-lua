@@ -1,3 +1,10 @@
+<2.8>
+- items by type were added to the inventory main and secondary
+- sql fie will be needed look in vorp discord on how to update
+- theres 10 types of items now
+- added API to update custom inventories slots
+- loading weapons from secondary inventories is now separated from player weapons
+- make sure to update all files and fxmanifest to keep getting version check
 <2.7>
 - small fixes on weapon use
 - fix for when transfering weapons that are set as equiped  would not let use other weapons

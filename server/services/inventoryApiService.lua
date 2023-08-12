@@ -120,7 +120,7 @@ InventoryAPI.getInventory = function(player, cb)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
-	local userInventory = UsersInventories["default"][identifier]
+	local userInventory = UsersInventories.default[identifier]
 
 	if userInventory then
 		local playerItems = {}
@@ -134,7 +134,8 @@ InventoryAPI.getInventory = function(player, cb)
 				type = item:getType(),
 				count = item:getCount(),
 				limit = item:getLimit(),
-				canUse = item:getCanUse()
+				canUse = item:getCanUse(),
+				group = item:getGroup(),
 			}
 			table.insert(playerItems, newItem)
 		end
@@ -183,7 +184,8 @@ InventoryAPI.getUserWeapons = function(player, cb)
 				propietary = currentWeapon:getPropietary(),
 				used = currentWeapon:getUsed(),
 				ammo = currentWeapon:getAllAmmo(),
-				desc = currentWeapon:getDesc()
+				desc = currentWeapon:getDesc(),
+				group = 5
 			}
 			table.insert(userWeapons2, weapon)
 		end
@@ -458,6 +460,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata, cb)
 
 	if cb == nil then
 		cb = function(result)
+
 		end
 	end
 
@@ -473,23 +476,17 @@ InventoryAPI.addItem = function(player, name, amount, metadata, cb)
 	local sourceCharacter = sourceUser.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charIdentifier = sourceCharacter.charIdentifier
-	local userInventory = UsersInventories["default"][identifier]
+	local userInventory = UsersInventories.default[identifier]
 
 	if userInventory == nil then
-		UsersInventories["default"][identifier] = {}
-		userInventory = UsersInventories["default"][identifier] -- create reference to actual table
+		UsersInventories.default[identifier] = {}
+		userInventory = UsersInventories.default[identifier] -- create reference to actual table
 	end
 
 	if not userInventory or amount <= 0 then
 		return cb(false)
 	end
-
-	local sourceItemLimit = svItem:getLimit()
-	local itemLabel = svItem:getLabel()
-	local itemType = svItem:getType()
-	local itemCanRemove = svItem:getCanRemove()
-	local itemDefaultMetadata = svItem:getMetadata()
-	local ItemDesc = svItem:getDesc()
+	-- TODO add check for whole inventory check as well
 	InventoryAPI.canCarryItem(_source, name, amount, function(result)
 		if result then
 			local item = SvUtils.FindItemByNameAndMetadata("default", identifier, name, metadata)
@@ -503,15 +500,16 @@ InventoryAPI.addItem = function(player, name, amount, metadata, cb)
 					item = Item:New({
 						id = craftedItem.id,
 						count = amount,
-						limit = sourceItemLimit,
-						label = itemLabel,
-						metadata = SharedUtils.MergeTables(itemDefaultMetadata, metadata),
+						limit = svItem:getLimit(),
+						label = svItem:getLabel(),
+						metadata = SharedUtils.MergeTables(svItem:getMetadata(), metadata),
 						name = name,
-						type = itemType,
+						type = svItem:getType(),
 						canUse = true,
-						canRemove = itemCanRemove,
+						canRemove = svItem:getCanRemove(),
 						owner = charIdentifier,
-						desc = ItemDesc
+						desc = svItem:getDesc(),
+						group = svItem:getGroup() or 1
 					})
 					userInventory[craftedItem.id] = item
 					TriggerClientEvent("vorpCoreClient:addItem", _source, item)
@@ -544,7 +542,8 @@ InventoryAPI.getItemByMainId = function(player, mainid, cb)
 					type = item:getType(),
 					count = item:getCount(),
 					limit = item:getLimit(),
-					canUse = item:getCanUse()
+					canUse = item:getCanUse(),
+					group = item:getGroup(),
 				}
 				return cb(itemRequested) -- send table of the item requested
 			end
@@ -661,13 +660,6 @@ InventoryAPI.subItem = function(player, name, amount, metadata, cb)
 	end
 end
 
----comment
----@param player integer
----@param itemId integer
----@param metadata table
----@param amount integer an ammount if you require to remove this many or set this many
----@param cb any
----@return any
 InventoryAPI.setItemMetadata = function(player, itemId, metadata, amount, cb)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
@@ -710,7 +702,8 @@ InventoryAPI.setItemMetadata = function(player, itemId, metadata, amount, cb)
 					canUse = true,
 					canRemove = item:getCanRemove(),
 					owner = charId,
-					desc = item:getDesc()
+					desc = item:getDesc(),
+					group = item:getGroup(),
 				})
 			userInventory[craftedItem.id] = item
 			TriggerClientEvent("vorpCoreClient:addItem", _source, item)
@@ -783,8 +776,6 @@ InventoryAPI.getItem = function(player, itemName, cb, metadata)
 	end
 end
 
-
-
 InventoryAPI.getcomps = function(player, weaponid, cb)
 	local _source = player
 	MySQL.query('SELECT comps FROM loadout WHERE id = @id ', { ['id'] = weaponid }, function(result)
@@ -795,8 +786,6 @@ InventoryAPI.getcomps = function(player, weaponid, cb)
 		end
 	end)
 end
-
-
 
 InventoryAPI.deletegun = function(player, weaponid, cb)
 	local _source = player
@@ -840,6 +829,7 @@ InventoryAPI.registerWeapon = function(_target, wepname, ammos, components, comp
 	local targetCharId = targetCharacter.charIdentifier
 	local job = targetCharacter.job
 
+	-- TODO make this a function to avoid repeated code
 	-- whitelist jobs for custom amount
 	if Config.JobsAllowed[job] then
 		DefaultAmount = Config.JobsAllowed[job]
@@ -928,6 +918,7 @@ InventoryAPI.registerWeapon = function(_target, wepname, ammos, components, comp
 						charId = targetCharId,
 						currInv = "default",
 						dropped = 0,
+						group = 5,
 					})
 					UsersWeapons["default"][weaponId] = newWeapon
 					TriggerEvent("syn_weapons:registerWeapon", weaponId)
@@ -1146,7 +1137,7 @@ InventoryAPI.onNewCharacter = function(playerId)
 	for key, value in pairs(Config.startItems) do
 		TriggerEvent("vorpCore:addItem", playerId, tostring(key), tonumber(value), {})
 	end
-
+    -- TODO remove object from weapons as ammo works with items
 	for key, value in pairs(Config.startWeapons) do
 		local auxBullets = {}
 		local receivedBullets = {}
@@ -1211,12 +1202,11 @@ InventoryAPI.registerInventory = function(id, name, limit, acceptWeapons, shared
 		limitedWeapons = {},
 	}
 	UsersInventories[id] = {}
-	if UsersWeapons[id] == nil then
+	if not UsersWeapons[id] then
 		UsersWeapons[id] = {}
 	end
 
 	if Config.Debug then
-		Wait(9000) -- so it doesn't print everywhere in the console
 		Log.print("Custom inventory[^3" .. id .. "^7] ^2Registered!^7")
 	end
 end
@@ -1225,11 +1215,11 @@ end
 
 InventoryAPI.AddPermissionMoveToCustom = function(id, jobName, grade)
 	if not CustomInventoryInfos[id] then
-		return -- dont add
+		return
 	end
 
 	if not jobName and not grade then
-		return -- dont add
+		return
 	end
 	if Config.Debug then
 		Log.print("AdPermsMoveTo  for [^3" .. jobName .. "^7] and grade [^3" .. grade .. "^7]")
@@ -1268,7 +1258,7 @@ end
 
 
 
-InventoryAPI.removeInventory = function(id, name)
+InventoryAPI.removeInventory = function(id)
 	if CustomInventoryInfos[id] == nil then
 		return
 	end
@@ -1278,8 +1268,20 @@ InventoryAPI.removeInventory = function(id, name)
 	UsersWeapons[id] = nil
 
 	if Config.Debug then
-		Wait(9000) -- so it doesn't print everywhere in the console
 		Log.print("Custom inventory[^3" .. id .. "^7] ^2Removed!^7")
+	end
+end
+
+
+InventoryAPI.updateCustomInventorySlots = function(id, slots)
+	if not CustomInventoryInfos[id] or not slots then
+		return
+	end
+
+	CustomInventoryInfos[id].limit = slots
+
+	if Config.Debug then
+		Log.print("Custom inventory[^3" .. id .. "^7] set slots to ^2" .. slots .. "^7")
 	end
 end
 
@@ -1291,7 +1293,6 @@ InventoryAPI.setCustomInventoryItemLimit = function(id, itemName, limit)
 	CustomInventoryInfos[id].limitedItems[string.lower(itemName)] = limit -- create table with item name and count
 
 	if Config.Debug then
-		Wait(9000) -- so it doesn't print everywhere in the console
 		Log.print("Custom inventory[^3" .. id .. "^7] set item[^3" .. itemName .. "^7] limit to ^2" .. limit .. "^7")
 	end
 end
@@ -1304,7 +1305,6 @@ InventoryAPI.setCustomInventoryWeaponLimit = function(id, wepName, limit)
 	CustomInventoryInfos[id].limitedWeapons[string.lower(wepName)] = limit -- create table with item name and count
 
 	if Config.Debug then
-		Wait(9000) -- so it doesn't print everywhere in the console
 		Log.print("Custom inventory[^3" .. id .. "^7] set item[^3" .. wepName .. "^7] limit to ^2" .. limit .. "^7")
 	end
 end
@@ -1335,13 +1335,14 @@ InventoryAPI.reloadInventory = function(player, id)
 	for weaponId, weapon in pairs(UsersWeapons[id]) do
 		if invData.shared or weapon.charId == sourceCharIdentifier then
 			itemList[#itemList + 1] = Item:New({
-				id = weaponId,
+				id    = weaponId,
 				count = 1,
-				name = weapon.name,
+				name  = weapon.name,
 				label = weapon.name,
 				limit = 1,
-				type = "item_weapon",
-				desc = weapon.desc
+				type  = "item_weapon",
+				desc  = weapon.desc,
+				group = 5,
 			})
 		end
 	end
@@ -1388,7 +1389,8 @@ InventoryAPI.openCustomInventory = function(player, id)
 							canRemove = dbItem.can_remove,
 							createdAt = item.created_at,
 							owner = item.character_id,
-							desc = dbItem.desc
+							desc = dbItem.desc,
+							group = dbItem.group or 1,
 						})
 					end
 				end
@@ -1408,6 +1410,7 @@ InventoryAPI.openCustomInventory = function(player, id)
 				for _, item in pairs(inventory) do
 					if svItems[item.item] ~= nil then
 						local dbItem = svItems[item.item]
+
 						characterInventory[item.id] = Item:New({
 							count = tonumber(item.amount),
 							id = item.id,
@@ -1420,7 +1423,8 @@ InventoryAPI.openCustomInventory = function(player, id)
 							canRemove = dbItem.can_remove,
 							createdAt = item.created_at,
 							owner = charIdentifier,
-							desc = dbItem.desc
+							desc = dbItem.desc,
+							group = dbItem.group or 1,
 						})
 					end
 				end
@@ -1433,8 +1437,9 @@ InventoryAPI.openCustomInventory = function(player, id)
 	end
 end
 
-InventoryAPI.closeCustomInventory = function(player, id)
-	local _source = player
+
+InventoryAPI.closeCustomInventory = function(source, id)
+	local _source = source
 	if CustomInventoryInfos[id] == nil then
 		return
 	end

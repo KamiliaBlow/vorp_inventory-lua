@@ -358,9 +358,9 @@ NUIService.NUISetNearPlayers = function(obj, nearestPlayers)
 		TriggerEvent('vorp:TipRight', T.noplayersnearby, 5000)
 		return
 	end
-
-	print('[^NUISetNearPlayers^7] ^2Info^7: players found = ' .. json.encode(nearestPlayers));
-
+	if Config.Debug then
+		print('[^NUISetNearPlayers^7] ^2Info^7: players found = ' .. json.encode(nearestPlayers));
+	end
 	local item = {}
 
 	for k, v in pairs(obj) do
@@ -786,3 +786,9 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
+NUIService.ChangeClothing = function(item)
+	if item then
+		ExecuteCommand(tostring(item))
+	end
+end

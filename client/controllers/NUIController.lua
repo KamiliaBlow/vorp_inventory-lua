@@ -8,6 +8,7 @@ RegisterNUICallback('GetNearPlayers', NUIService.NUIGetNearPlayers)
 RegisterNUICallback('UnequipWeapon', NUIService.NUIUnequipWeapon)
 RegisterNUICallback('TakeFromCustom', NUIService.NUITakeFromCustom)
 RegisterNUICallback('MoveToCustom', NUIService.NUIMoveToCustom)
+RegisterNUICallback("ChangeClothing", NUIService.ChangeClothing)
 --========================================================================--
 -- shared
 RegisterNetEvent("vorp_inventory:CloseInv")

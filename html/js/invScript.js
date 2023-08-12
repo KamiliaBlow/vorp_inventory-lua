@@ -1,37 +1,123 @@
+
+
+/* DROP DOWN BUTTONS MAIN AND SECONDARY INVENTORY */
+
+function toggleDropdown(mainButton) {
+  const dropdownButtonsContainers = document.querySelectorAll('.dropdownButtonContainer');
+  dropdownButtonsContainers.forEach((container) => {
+    if (container.classList.contains(mainButton)) {
+      container.classList.toggle('showDropdown');
+    } else {
+      container.classList.remove('showDropdown');
+    }
+  });
+}
+/* 0 is empty divs 1  is fixed divs like money and ammo */
+const Actions = {
+  all: { types: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+  medical: { types: [0, 2] },
+  foods: { types: [0, 3] },
+  weapons: { types: [0, 5] },
+  ammo: { types: [0, 6] },
+  tools: { types: [0, 4] },
+  animals: { types: [0, 8] },
+  documents: { types: [0, 7] },
+  valuables: { types: [0, 9] },
+  horse: { types: [0, 10] },
+  herbs: { types: [0, 11] },
+
+};
+
+function action(type, param, inv) {
+  if (type === 'itemtype') {
+    if (param in Actions) {
+      const action = Actions[param];
+      showItemsByType(action.types, inv);
+    } else {
+      const defaultAction = Actions['all'];
+      showItemsByType(defaultAction.types, inv);
+    }
+  } else if (type === 'clothing') {
+    $.post(
+      `https://${GetParentResourceName()}/ChangeClothing`, JSON.stringify(param)
+    );
+  }
+}
+
+/* FILTER ITEMS BY TYPE */
+function showItemsByType(itemTypesToShow, inv) {
+  var itemDiv = 0;
+  var itemEmpty = 0;
+  $(`#${inv} .item`).each(function () {
+    const group = $(this).data("group");
+
+    if (itemTypesToShow.length === 0 || itemTypesToShow.includes(group)) {
+      if (group != 0) {
+        itemDiv = itemDiv + 1;
+      } else {
+        itemEmpty = itemEmpty + 1;
+      }
+      $(this).show();
+    } else {
+      $(this).hide();
+    }
+  });
+
+  if (itemDiv < 12) {
+    if (itemEmpty > 0) {
+      for (let i = 0; i < itemEmpty; i++) {
+        $(`#${inv} .item[data-group="0"]`).remove();
+      }
+    }
+    /* if itemDiv is less than 12 then create the rest od the divs */
+    let emptySlots = 16 - itemDiv;
+    for (let i = 0; i < emptySlots; i++) {
+      $(`#${inv}`).append(`
+          <div data-group="0" class="item"></div>`);
+
+    }
+  }
+
+}
+
 function inventorySetup(items) {
   $("#inventoryElement").html("");
+  var divAmount = 0;
+
+  // Count the number of items first
+  $.each(items, function (index, item) {
+    divAmount = divAmount + 1;
+  });
+
 
   $.each(items, function (index, item) {
-    count = item.count;
+    var count = item.count;
+    var limit = item.limit;
 
-    if (item.limit > 0) {
-      count =
-        count +
-        " / " +
-        item.limit; /*   count = count + "" ;   if you want to disable the count max items add this instead. */
-    }
+    if (limit > 0) {
+      count = count + " / " + limit;
+    };
+
     if (item.type != "item_weapon") {
-      $("#inventoryElement").append(
-        "<div data-label='" +
-          item.label +
-          "' style='background-image: url(\"img/items/" +
-          item.name.toLowerCase() +
-          ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" +
-          index +
-          "' class='item'><div class='count'>" +
-          count +
-          "</div><div class='text'></div></div>"
-      );
+      /* items */
+      if (!item.group) {
+        item.group = 1;
+      }
+
+      $("#inventoryElement").append(`
+            <div data-label='${item.label}' data-group='${item.group}' style='background-image: url("img/items/${item.name.toLowerCase()}.png"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item'>
+                <div class='count'<span style ='color:Black'>${count}</span></div>
+                <div class='text'></div>
+            </div>
+          `);
+
     } else {
-      $("#inventoryElement").append(
-        "<div data-label='" +
-          item.label +
-          "' style='background-image: url(\"img/items/" +
-          item.name.toLowerCase() +
-          ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" +
-          index +
-          "' class='item'></div></div>"
-      );
+      /* weapons */
+      const group = 5;
+      $("#inventoryElement").append(`
+          <div data-label='${item.label}' data-group='${group}' style='background-image: url("img/items/${item.name.toLowerCase()}.png"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item'></div>
+          `);
+
     }
 
     $("#item-" + index).data("item", item);
@@ -91,6 +177,7 @@ function inventorySetup(items) {
           },
         });
       }
+
       if (item.canUse) {
         data.push({
           text: LANGUAGE.use,
@@ -109,7 +196,6 @@ function inventorySetup(items) {
         });
       }
     }
-
     if (item.canRemove) {
       data.push({
         text: LANGUAGE.give,
@@ -166,7 +252,9 @@ function inventorySetup(items) {
         OverSetDesc(" ");
       }
     );
+
   });
+
 
   var gunbelt_item = "gunbelt";
   var gunbelt_label = LANGUAGE.gunbeltlabel;
@@ -192,19 +280,19 @@ function inventorySetup(items) {
   if (empty) {
     data.push({
       text: LANGUAGE.empty,
-      action: function () {},
+      action: function () { },
     });
   }
 
   if (Config.AddAmmoItem) {
     $("#inventoryElement").append(
       "<div data-label='" +
-        gunbelt_label +
-        "' style='background-image: url(\"img/items/" +
-        gunbelt_item +
-        ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" +
-        gunbelt_item +
-        "' class='item'><div class='text'></div></div>"
+      gunbelt_label +
+      "'data-group ='1' style='background-image: url(\"img/items/" +
+      gunbelt_item +
+      ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" +
+      gunbelt_item +
+      "' class='item'><div class='text'></div></div>"
     );
 
     $("#item-" + gunbelt_item).contextMenu([data], {
@@ -274,13 +362,9 @@ function inventorySetup(items) {
 
   if (Config.AddDollarItem) {
     $("#inventoryElement").append(
-      "<div data-label='" +
-        m_label +
-        "' style='background-image: url(\"img/items/" +
-        m_item +
-        ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" +
-        m_item +
-        "' class='item'><div class='text'></div></div>"
+      "<div data-label='" + m_label + "'data-group ='1' style='background-image: url(\"img/items/" + m_item +
+      ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" +
+      m_item + "' class='item'><div class='text'></div></div>"
     );
 
     $("#item-" + m_item).contextMenu([data], {
@@ -353,13 +437,11 @@ function inventorySetup(items) {
 
     if (Config.AddGoldItem) {
       $("#inventoryElement").append(
-        "<div data-label='" +
-          g_label +
-          "' style='background-image: url(\"img/items/" +
-          g_item +
-          ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" +
-          g_item +
-          "' class='item'><div class='text'></div></div>"
+        "<div data-label='" + g_label + "'data-group ='1' style='background-image: url(\"img/items/" +
+        g_item +
+        ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" +
+        g_item +
+        "' class='item'><div class='text'></div></div>"
       );
 
       $("#item-" + g_item).contextMenu([data], {
@@ -408,5 +490,21 @@ function inventorySetup(items) {
 
     isOpen = true;
     initDivMouseOver();
+  }
+
+  /* in here we ensure that at least all divs are filled */
+  if (divAmount < 12 && divAmount > 0) {
+    var emptySlots = 14 - divAmount;
+    for (var i = 0; i < emptySlots; i++) {
+      $("#inventoryElement").append(`
+          <div class='item' data-group='0'></div> `);
+    }
+  } else if (divAmount == 0) {
+    var emptySlots = 14 - divAmount;
+    for (var i = 0; i < emptySlots; i++) {
+      $("#inventoryElement").append(`
+          <div class='item' data-group='0'></div> `);
+    }
+
   }
 }

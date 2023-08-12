@@ -15,10 +15,6 @@ AddEventHandler("vorpCore:getItemContainingMetadata", InventoryAPI.getItemContai
 AddEventHandler("vorpCore:getItemMatchingMetadata", InventoryAPI.getItemMatchingMetadata)
 AddEventHandler("vorpCore:getItemCount", InventoryAPI.getItems)
 AddEventHandler("vorpCore:getUserInventory", InventoryAPI.getInventory)
---shared for dev mode
-RegisterServerEvent("vorpCore:LoadAllAmmo")
-AddEventHandler("vorpCore:LoadAllAmmo", InventoryAPI.LoadAllAmmo)
---
 AddEventHandler("vorpCore:canCarryItems", InventoryAPI.canCarryAmountItem)
 AddEventHandler("vorpCore:canCarryItem", InventoryAPI.canCarryItem)
 AddEventHandler("vorpCore:canCarryWeapons", InventoryAPI.canCarryAmountWeapons)
@@ -38,3 +34,9 @@ AddEventHandler("vorp_inventory:Server:AddPermissionMoveToCustom", InventoryAPI.
 AddEventHandler("vorp_inventory:Server:AddPermissionTakeFromCustom", InventoryAPI.AddPermissionTakeFromCustom)
 AddEventHandler("vorp_inventory:Server:BlackListCustom", InventoryAPI.BlackListCustom)
 AddEventHandler("vorpCore:setInventoryWeaponLimit", InventoryAPI.setCustomInventoryWeaponLimit)
+AddEventHandler("vorp_inventory:Server:updateCustomInventorySlots", InventoryAPI.updateCustomInventorySlots)
+
+-- shared for dev mode --
+RegisterServerEvent("vorpCore:LoadAllAmmo")
+AddEventHandler("vorpCore:LoadAllAmmo", InventoryAPI.LoadAllAmmo)
+-------------------------

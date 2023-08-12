@@ -1,11 +1,25 @@
----@type table<string, Item>
+
+
+---@diagnostic disable: undefined-global
+---@class InventoryService @InventoryService
+---@class Weapon @Weapon
+---@class Item @Item
+---@field PullAllInventory fun():table
+---@field receiveItem fun(name:string, id:string, amount:number, metadata:table)
+---@field removeItem fun(name:string, id:string, count:number)
+---@field receiveWeapon fun(id:string, propietary:string, name:string, ammos:table)
+---@field onSelectedCharacter fun(charId:string)
+---@field processItems fun(items:table)
+---@field getLoadout fun(loadout:table)
+---@field getWeapons fun():table
+---@field getInventory fun(table:table)
+---@field svItems table<string,Item>
+---@field UserWeapons table<string,Weapon>
+---@field UserInventory table<number,Item>
 svItems = {}
 InventoryService = {}
 UserWeapons = {}
----@class UserInventory: table<string, Item>
 UserInventory = {}
-bulletsHash = {}
-
 
 InventoryService.PullAllInventory = function()
 	return UserInventory
@@ -40,7 +54,9 @@ InventoryService.removeItem = function(name, id, count)
 	local item = UserInventory[id]
 
 	if item ~= nil then
-		print("[^2removeItem^7] ^1Debug^7: Going to call Item:quitCount with amount = ^3" .. tonumber(count) .. "^7.")
+		if Config.Debug then
+			print("[^2removeItem^7] ^1Debug^7: Going to call Item:quitCount with amount = ^3" .. tonumber(count) .. "^7.")
+		end
 		item:quitCount(count)
 
 		if item:getCount() <= 0 then
@@ -83,9 +99,9 @@ InventoryService.onSelectedCharacter = function(charId)
 	TriggerServerEvent("vorpinventory:getItemsTable")
 	Wait(300)
 	TriggerServerEvent("vorpinventory:getInventory")
-	Wait(5000)
+	Wait(1000)
 	TriggerServerEvent("vorpCore:LoadAllAmmo")
-	Wait(2500)
+	Wait(1000)
 	print("ammo loaded")
 	TriggerEvent("vorpinventory:loaded")
 end
@@ -136,34 +152,26 @@ InventoryService.getLoadout = function(loadout)
 end
 
 InventoryService.getInventory = function(inventory)
-	if inventory ~= nil and inventory ~= '' then
+	if inventory and inventory ~= '' then
 		UserInventory = {}
 		local inventoryItems = json.decode(inventory)
 
 		for _, item in pairs(inventoryItems) do
-			if svItems[item.item] ~= nil then
+			if svItems[item.item] then
 				local dbItem = svItems[item.item]
-				local itemAmount = tonumber(item.amount)
-				local itemLimit = tonumber(dbItem.limit)
-				local itemCreatedAt = item.created_at
-				local itemLabel = dbItem.label
-				local itemCanRemove = dbItem.canRemove
-				local itemType = dbItem.type
-				local itemCanUse = dbItem.canUse
-				local itemDefaultMetadata = dbItem.metadata
-				local itemDesc = dbItem.desc
 
 				local newItem = Item:New({
 					id = item.id,
-					count = itemAmount,
-					limit = itemLimit,
-					label = itemLabel,
+					count = tonumber(item.amount),
+					limit = tonumber(dbItem.limit),
+					label = dbItem.label,
 					name = item.item,
-					metadata = SharedUtils.MergeTables(itemDefaultMetadata, item.metadata),
-					type = itemType,
-					canUse = itemCanUse,
-					canRemove = itemCanRemove,
-					desc = itemDesc
+					metadata = SharedUtils.MergeTables(dbItem.metadata, item.metadata),
+					type = dbItem.type,
+					canUse = dbItem.canUse,
+					canRemove = dbItem.canRemove,
+					desc = dbItem.desc,
+					group = dbItem.group or 1,
 				})
 
 				UserInventory[item.id] = newItem
